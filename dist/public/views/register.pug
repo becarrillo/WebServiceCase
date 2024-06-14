@@ -1,0 +1,352 @@
+doctype html
+html(lang="es")
+    head
+        meta(charset="UTF-8")
+        meta(name="viewport", content="width=device-width, initial-scale=1.0")
+        title Registrarse
+    body(style="display: flex; flex-direction: column; margin-top: 5em;")
+        h2(style="display: flex; justify-content: center; font-family: sans; margin-bottom: 2em;") Registro de Usuario
+        form(name="registerForm" style="display: flex; flex-direction: column; align-self: center;  padding: 21px; width: 27rem; background-color: pink;" method="POST" action="/registro/guardar")
+            div(style="display: flex; flex-direction: column; margin-bottom: 2.1em;")
+                label(for="lastname" style="font-family: sans; font-size: smaller;") apellidos
+                div(style="display: flex; flex-direction: column")
+                    input(class="formInput" type="text" id="lastname" name="lastname" style="height: 14.5pt")
+                    small(class="invalidMessage" id="lastnameInvalidMsg" style="display: inline-block; margin-left: 2px; font-family: sans; font-size: smaller; color: red" hidden)
+            div(style="display: flex; flex-direction: column; margin-bottom: 2.1em;")
+                label(for="firstname" style="font-family: sans; font-size: smaller;") nombre
+                div(style="display: flex; flex-direction: column")
+                    input(class="formInput" type="text" id="firstname" name="firstname" style="height: 14.5pt")
+                    small(class="invalidMessage" id="firstnameInvalidMsg" style="display: inline-block; margin-left: 2px; font-family: sans; font-size: smaller; color: red" hidden)
+            div(style="display: flex; flex-direction: column; margin-bottom: 2.1em;")
+                label(for="documentId" style="font-family: sans; font-size: smaller;") número de documento
+                div(style="display: flex; flex-direction: column")
+                    input(class="formInput" type="text" id="documentId" name="documentId" style="height: 14.5pt")
+                    small(class="invalidMessage" class="invalidation" id="documentIdInvalidMsg" style="display: inline-block; margin-left: 2px; font-family: sans; font-size: smaller; color: red" hidden)
+            div(style="display: flex; flex-direction: column; margin-bottom: 2.1em;")
+                label(for="email" style="font-family: sans; font-size: smaller;") correo
+                div(style="display: flex; flex-direction: column")
+                    input(class="formInput" type="email" id="email" name="email" style="height: 14.5pt")
+                    small(class="invalidMessage" id="emailInvalidFormatMsg" style="display: inline-block; margin-left: 2px; font-family: sans; font-size: smaller; color: red" hidden)
+                    small(class="invalidMessage" id="shortEmailInvalidMsg" style="display: inline-block; margin-left: 2px; font-family: sans; font-size: smaller; color: red" hidden)
+            div(style="display: flex; flex-direction: column; margin-bottom: 1.6em")
+                label(for="username" style="font-family: sans; font-size: smaller;") usuario (nombre o apodo)
+                div(style="display: flex; flex-direction: column")
+                    input(class="formInput" type="text" id="username" name="username" style="height: 14.5pt")
+                    small(class="invalidMessage" id="usernameInvalidMsg" style="display: inline-block; margin-left: 2px; font-family: sans; font-size: smaller; color: red" hidden)
+            div(style="display: flex; flex-direction: column; margin-bottom: 2.1em;")
+                label(for="password" style="font-family: sans; font-size: smaller;") contraseña segura
+                div(style="display: flex; flex-direction: column")
+                    input(class="formInput" type="password" id="password" name="password" style="height: 14.5pt")
+                    small(class="invalidMessage" id="pswValidationError" style="display: inline-block; margin-left: 2px; font-family: sans; font-size: smaller; color: red" hidden)
+            div(style="display: flex; flex-direction: column; margin-bottom: 2.1em;")
+                label(for="passwordConfirm" style="font-family: sans; font-size: smaller;") confirmar contraseña
+                div(style="display: flex; flex-direction: column")
+                    input(class="formInput" type="password" id="passwordConfirm" style="height: 14.5pt")
+                    small(class="invalidMessage" id="pswConfirmValidationError" style="margin-left: 2px; font-family: sans; font-size: smaller; color: red" hidden)
+            button(type="submit" id="submit-btn" style="background-color: grey; color: white; padding: 6px" disabled) ENVIAR
+        include components/footer
+        script(type="text/javascript").
+            function checkAllTruthy(validation) {
+                return validation;
+            }
+            /*  checkValidationsForEnableSubmitBtn -> Verify ((inputs validations in array)===true)
+                then submit-btn will be enabled.
+                (es): activa el botón del submit si todas la validaciones son verdaderas
+                dentro del arreglo de longitud que tiene que ser igual a la cantidad de inputs*/
+            function checkValidationsForEnableSubmitBtn(validsArray) {
+                if (validsArray.length===inputsListLength && validsArray.every(checkAllTruthy)) {
+                    submitBtn.removeAttribute('disabled');
+                    submitBtn.setAttribute('style', 'background-color: green; color: yellow; padding: 6px; cursor: pointer');
+                } else {
+                    submitBtn.setAttribute('style', 'background-color: grey; color: white; padding: 6px; cursor: default');
+                    submitBtn.setAttribute('disabled', 'true');
+                }
+
+                document.querySelectorAll('.invalidMessage').forEach(el => {
+                    if (!el.innerText && validations.length < inputsListLength) return false;
+                });
+            }
+            /*  this function fills with false the array from index where the value
+                is undefined into until it be less one than index where the code
+                calls it and add a boolean value.
+                (es): Esta función rellena con false la matriz desde el índice
+                donde el valor no está definido hasta que sea menor que index
+                donde el código lo llama y agrega un valor booleano
+            */
+            const fillValidationsBlanks = (inputsLimitIndex) => {
+                let valueIndexFrom;
+                let noContentIndexesCount;
+                noContentIndexesCount = 0;
+                for (let a=inputsLimitIndex; a>=0; a--) {
+                    if (validations.at(a)===undefined) {
+                        noContentIndexesCount+=1;
+                    } else {
+                        break;
+                    }
+                }
+
+                for (let b=inputsLimitIndex-noContentIndexesCount+1; b<=inputsLimitIndex; b++) {
+                    validations[b] = false;
+                }
+            }
+            const submitBtn = document.querySelector('#submit-btn');
+            const inputsListLength = document.querySelectorAll('.formInput').length;
+            const lastnameElement = document.querySelector('#lastname');
+            const validations = [];
+            
+            let lastnameEntry = '';
+            lastnameElement.addEventListener('change', (ev) => {    // When [input value change] then -> 
+                lastnameEntry = ev.target.value;
+                lastnameEntry.length>=0 && lastnameEntry.length<8 ? (
+                    lastnameInvalidMsg.textContent = "debe tener al menos 8 caracteres",
+                    !validations.at(0) && (validations.length<inputsListLength) ? (
+                        validations.at(0)!==undefined ? (
+                            lastnameInvalidMsg.removeAttribute('hidden')
+                        ) : (
+                            lastnameInvalidMsg.removeAttribute('hidden'),
+                            validations.splice(0, 1, false)
+                        )
+                    ) : (
+                        lastnameInvalidMsg.removeAttribute('hidden'),
+                        validations.splice(0, 1, false)
+                    )
+                ) : (
+                    lastnameInvalidMsg.textContent = "",
+                    !validations.at(0) && (validations.length<inputsListLength) ? (
+                        validations.at(0)!==undefined ? (
+                            lastnameInvalidMsg.setAttribute('hidden', 'true'),
+                            validations.splice(0, 1, true)
+                        ) : (
+                            lastnameInvalidMsg.setAttribute('hidden', 'true'),
+                            validations.push(true)
+                        )
+                    ) : (
+                        lastnameInvalidMsg.setAttribute('hidden', 'true'),
+                        validations.splice(0, 1, true)
+                    )
+                );
+                checkValidationsForEnableSubmitBtn(validations);
+            });
+            const firstnameElement = document.querySelector('#firstname');
+            let firstnameEntry = '';
+            firstnameElement.addEventListener('change', (ev) => {    // When [input value change] then ->
+                firstnameEntry = ev.target.value;
+                firstnameEntry.length>=0 && firstnameEntry.length<4 ? (
+                    firstnameInvalidMsg.removeAttribute('hidden'),
+                    firstnameInvalidMsg.textContent = "debe tener al menos 4 caracteres",
+                    !validations.at(1) && (validations.length<inputsListLength) ? (
+                        validations.at(1)!==undefined ? (
+                            firstnameInvalidMsg.setAttribute('hidden', 'true'),
+                            validations.splice(1, 1, true)
+                        ) : (
+                            fillValidationsBlanks(0),
+                            validations.push(false)
+                        )
+                    ) : validations.splice(1, 1, false)
+                ) : (
+                    firstnameInvalidMsg.textContent = "",
+                    firstnameInvalidMsg.setAttribute('hidden', 'true'),
+                    !validations.at(1) && (validations.length<inputsListLength) ? (
+                        validations.at(1)!==undefined ? (
+                            firstnameInvalidMsg.setAttribute('hidden', 'true'),
+                            validations.splice(1, 1, true)
+                        ) : (
+                            fillValidationsBlanks(0),
+                            validations.push(true)
+                        )
+                    ) : validations.splice(1, 1, true)
+                );
+                checkValidationsForEnableSubmitBtn(validations);
+            });
+            const documentIdElement = document.querySelector('#documentId');
+            let documentIdEntry = '';
+            documentIdElement.addEventListener('change', (ev) => {    // When [input value change] then ->
+                documentIdEntry = ev.target.value;
+                documentIdEntry.length>=0 && documentIdEntry.length<8 ? (
+                    documentIdInvalidMsg.removeAttribute('hidden'),
+                    documentIdInvalidMsg.textContent = "debe ser de longitud de igual o más que 8",
+                    !validations.at(2) && (validations.length<inputsListLength) ? (
+                        validations.at(2)!==undefined ? (
+                            documentIdInvalidMsg.setAttribute('hidden', 'true')
+                        ) : (
+                            fillValidationsBlanks(1),
+                            validations.push(false)
+                        )
+                    ): validations.splice(2, 1, false)
+                ) : (
+                    documentIdInvalidMsg.textContent = "",
+                    documentIdInvalidMsg.setAttribute('hidden', 'true'),
+                    !validations.at(2) && (validations.length<inputsListLength) ? (
+                        validations.at(2)!==undefined ? (
+                            lastnameInvalidMsg.setAttribute('hidden', 'true'),
+                            validations.splice(2, 1, true)
+                        ) : (
+                            fillValidationsBlanks(1),
+                            validations.push(true)
+                        )
+                    ) : validations.splice(2, 1, true)
+                );
+                checkValidationsForEnableSubmitBtn(validations);
+            });
+            const emailElement = document.querySelector('#email');
+            const emailInvalidFormatMsg = document.querySelector('#emailInvalidFormatMsg');
+            const shortEmailInvalidMsg = document.querySelector('#shortEmailInvalidMsg');
+            let emailEntry = '';
+            emailElement.addEventListener('change', (ev) => {    // When [input value change] then ->
+                emailEntry = ev.target.value;
+                !emailEntry.includes('@', 4) ? (
+                    !validations.at(3) ? (
+                        validations.length<inputsListLength ? (
+                            validations.at(3)!==undefined ? (
+                                emailInvalidFormatMsg.setAttribute('hidden', 'true')
+                            ) : (
+                                validations.push(false)
+                            )
+                        ): validations.splice(3, 1, false),
+                        emailInvalidFormatMsg.removeAttribute('hidden'),
+                        emailInvalidFormatMsg.textContent = "no es válido, debe comenzar por <id-de-correo>+'@'"
+                    ) : (
+                        validations.splice(3, 1, false),
+                        emailInvalidFormatMsg.removeAttribute('hidden'),
+                        emailInvalidFormatMsg.textContent = "no es válido, debe comenzar por <id-de-correo>+'@'"
+                    )
+                ) : (
+                    emailInvalidFormatMsg.textContent = null,
+                    emailInvalidFormatMsg.setAttribute('hidden', 'true')
+                );
+
+                emailEntry.length>=0 && emailEntry.length<13 ? (
+                    shortEmailInvalidMsg.textContent = "debe tener al menos 13 caracteres",
+                    !validations.at(3) ? (
+                        shortEmailInvalidMsg.removeAttribute('hidden'),
+                        validations.length<inputsListLength ? (
+                            validations.at(3)!==undefined ? (
+                                lastnameInvalidMsg.setAttribute('hidden', 'true'),
+                                validations.splice(3, 1, false)
+                            ) : (
+                                validations.push(false)
+                            )
+                        ): validations.splice(3, 1, false)
+                    ) : (
+                        shortEmailInvalidMsg.removeAttribute('hidden')
+                    )
+                ) : (
+                    !validations.at(3) ? (
+                        validations.length<inputsListLength ? (
+                            validations.at(3)!==undefined ? (
+                                lastnameInvalidMsg.setAttribute('hidden', 'true'),
+                                validations.splice(2, 1, true)
+                            ) : (
+                                fillValidationsBlanks(2),
+                                validations.push(true)
+                            )
+                        ): validations.splice(3, 1, true),
+                        shortEmailInvalidMsg.setAttribute('hidden', 'true'),
+                        shortEmailInvalidMsg.textContent = null
+                    ) : (
+                        shortEmailInvalidMsg.setAttribute('hidden', 'true'),
+                        shortEmailInvalidMsg.textContent = null
+                    ),
+                    shortEmailInvalidMsg.textContent = null
+                );
+
+                if (
+                    validations.at(3) && 
+                    (emailEntry.length>=0 && emailEntry.length<13 || !emailEntry.includes('@', 4))
+                ) {
+                    validations.splice(3, 1, false)
+                }
+                checkValidationsForEnableSubmitBtn(validations);
+            });
+            const usernameElement = document.querySelector('#username');
+            let usernameEntry = '';
+            usernameElement.addEventListener('change', (ev) => {    // When [input value change] then ->
+                usernameEntry = ev.target.value;
+                usernameEntry.length>=0 && usernameEntry.length<8 ? (
+                    usernameInvalidMsg.removeAttribute('hidden'),
+                    usernameInvalidMsg.textContent = "debe tener al menos 8 caracteres",
+                    !validations.at(4) && (validations.length<inputsListLength) ? (
+                        validations.at(4)!==undefined ? (
+                            lastnameInvalidMsg.setAttribute('hidden', 'true')
+                        ) : (
+                            validations.push(false)
+                        )
+                    ): validations.splice(4, 1, false)
+                ) : (
+                    usernameInvalidMsg.textContent = null,
+                    usernameInvalidMsg.setAttribute('hidden', 'true'),
+                    !validations.at(4) && (validations.length<inputsListLength) ? (
+                        validations.at(4)!==undefined ? (
+                            lastnameInvalidMsg.setAttribute('hidden', 'true'),
+                            validations.splice(4, 1, true)
+                        ) : (
+                            fillValidationsBlanks(3),
+                            validations.push(true)
+                        )
+                    ) : validations.splice(4, 1, true)
+                );
+                checkValidationsForEnableSubmitBtn(validations);
+            });
+            const pswElement = document.querySelector('#password');
+            const pswElement1 = document.querySelector('#passwordConfirm');
+            let passwordEntry = '';
+            let password1Entry = '';
+            pswElement.addEventListener('change', (ev) => {    // When [input value change] then ->
+                passwordEntry = ev.target.value;
+                const pswInvalidMsg = document.querySelector('#pswValidationError');
+                passwordEntry.length>=0 && passwordEntry.length<8 ? (
+                    pswInvalidMsg.removeAttribute('hidden'),
+                    pswInvalidMsg.textContent = "debe tener al menos 8 caracteres",
+                    !validations.at(5) && (validations.length<inputsListLength) ? (
+                        validations.at(5)!==undefined ? (
+                            lastnameInvalidMsg.setAttribute('hidden', 'true')
+                        ) : (
+                            validations.push(false)
+                        )
+                    ) : validations.splice(5, 1, false)
+                ) : (
+                    pswInvalidMsg.textContent = null,
+                    pswInvalidMsg.setAttribute('hidden', 'true'),
+                    !validations.at(5) && (validations.length<inputsListLength) ? (
+                        validations.at(5)!==undefined ? (
+                            pswInvalidMsg.setAttribute('hidden', 'true'),
+                            validations.splice(5, 1, true)
+                        ) : (
+                            fillValidationsBlanks(4),
+                            validations.push(true)
+                        )
+                    ) : validations.splice(5, 1, true)
+                );
+                checkValidationsForEnableSubmitBtn(validations);
+            });
+            pswElement1.addEventListener('change', ev => {    // When [input value change] then ->
+               password1Entry = ev.target.value;
+                const pswConfirmInvalidMsg = document.querySelector('#pswConfirmValidationError');
+                password1Entry!==passwordEntry ? (
+                    pswConfirmInvalidMsg.textContent = "no coincide con la anterior",
+                    !validations.at(6) && (validations.length<inputsListLength)? (
+                        validations.at(6)!==undefined ? (
+                            lastnameInvalidMsg.setAttribute('hidden', 'true')
+                        ) : (
+                            lastnameInvalidMsg.setAttribute('hidden', 'true'),
+                            validations.push(false)
+                        )
+                    ): (
+                        lastnameInvalidMsg.setAttribute('hidden', 'true'),
+                        validations.splice(6, 1, false)
+                    )
+                ) : (
+                    pswConfirmInvalidMsg.textContent = null,
+                    pswConfirmInvalidMsg.setAttribute('hidden', 'true'),
+                    !validations.at(6) && (validations.length<inputsListLength) ? (
+                        validations.at(6)!==undefined ? (
+                            validations.splice(5, 1, true)
+                        ) : (
+                            fillValidationsBlanks(5),
+                            validations.push(true)
+                        )
+                    ): validations.splice(6, 1, true)
+                );
+                checkValidationsForEnableSubmitBtn(validations);
+            });
+        

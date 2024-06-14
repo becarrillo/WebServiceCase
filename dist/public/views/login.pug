@@ -1,0 +1,180 @@
+doctype html
+html(lang="en")
+    head
+        meta(charset="UTF-8")
+        meta(name="viewport", content="width=device-width, initial-scale=1.0")
+        title Login
+    body(style="padding-top: 12rem;")
+        h2(style="display: flex; justify-content: center; font-family: sans; margin-bottom: 2em;") Inicio de sesión / Login
+        form(style="display: flex; flex-direction: column; margin: auto; padding: 16px; width: 24rem; background-color: pink;" method="POST" action="/login/autenticar")
+            div(style="display: flex; flex-direction: column; margin-bottom: 1.6em;")
+                label(for="username" style="font-family: sans") usuario
+                div(style="display: flex; flex-direction: column")    
+                    input(class="formInput" type="text" id="username" name="username" style="height: 14.5pt")
+                    small(class="invalidMessage" id="usernameValidationError" style="display: inline-block; margin-left: 2px; font-family: sans; font-size: smaller; color: red" hidden)
+            div(style="display: flex; flex-direction: column; margin-bottom: 2.1em;")
+                label(for="password" style="font-family: sans") contraseña
+                div(style="display: flex; flex-direction: column")
+                    input(class="formInput" type="password" id="password" name="password" style="height: 14.5pt")
+                    small(class="invalidMessage" id="pswValidationError" style="display: inline-block; margin-left: 2px; font-family: sans; font-size: smaller; color: red" hidden)
+            button(type="submit" id="submit-btn" style="background-color: grey; color: white; padding: 6px; cursor: default" disabled) INGRESAR
+        
+        include components/footer
+
+        script(type="text/javascript").
+            function checkAllTruthy(validation) {   //  this wait a boolean representating an input validation
+                return validation;
+            }
+            const inputsListLength = document.querySelectorAll('.formInput').length;
+            const usernameElement = document.querySelector('#username');
+            const pswElement = document.querySelector('#password');
+            const usernameValidationError = document.querySelector('#usernameValidationError');
+            const pswValidationError = document.querySelector('#pswValidationError');
+            /*  checkValidationsForEnableSubmitBtn -> Verify ((inputs validations in array)===true)
+                then submit-btn will be enabled.
+                (es): activa el botón del submit si todas la validaciones son verdaderas
+                dentro del arreglo de longitud que tiene que ser igual a la cantidad de inputs*/
+            function checkValidationsForEnableSubmitBtn(validsArray, length) {
+                // conditions: [those added validations array length] are same of [inputs validations count] & [all validations verified] are truthy
+                // (es): condiciones -> la longitud del arreglo validaciones agregadas iguale la cantidad de inputs y que las validaciones sean verdaderas
+                if (length===inputsListLength && validsArray.every(checkAllTruthy)) {
+                    const submitBtn = document.querySelector('#submit-btn');
+                    submitBtn.removeAttribute('disabled');
+                    submitBtn.setAttribute(
+                        'style',
+                        'background-color: green; color: yellow; padding: 6px; cursor: pointer'
+                    );
+                }
+            }
+            
+            let validations = [];
+            let validationsArrLength;
+            let usernameEntry = '';
+            usernameElement.addEventListener('change', (ev) => {
+                usernameEntry = ev.target.value;
+                if (validations.length<=2) {
+                    usernameEntry.length>=0 && usernameEntry.length<4 ? (
+                        !validations.at(0) ? (
+                            validations.at(0)!==undefined ? (
+                                !validations.at(1) ? (
+                                    usernameValidationError.removeAttribute('hidden'),
+                                    usernameValidationError.textContent = "debe tener al menos 4 caracteres"
+                                ) : (
+                                    validations.splice(0, 2),
+                                    validations.push(true),
+                                    validations.push(true)
+                                )
+                            ) : (
+                                usernameValidationError.removeAttribute('hidden'),
+                                usernameValidationError.textContent = "debe tener al menos 4 caracteres",
+                                validations.push(false)
+                            )
+                        ) : (
+                            !validations.at(1) ? (
+                                usernameValidationError.removeAttribute('hidden'),
+                                usernameValidationError.textContent = "debe tener al menos 4 caracteres"
+                            ) : (
+                                usernameValidationError.removeAttribute('hidden'),
+                                usernameValidationError.textContent = "debe tener al menos 4 caracteres",
+                                validations.splice(0, 2),
+                                validations.push(false),
+                                validations.push(true)
+                            )
+                        )
+                    ) : (
+                        !validations.at(0) ? (
+                            usernameValidationError.textContent = null,
+                            usernameValidationError.setAttribute('hidden', 'true'),
+                            validations.at(0)!==undefined ? (
+                                validations.at(1)!==undefined ? (
+                                    validations.splice(0, 2),
+                                    validations.push(true),
+                                    validations.push(true)
+                                ) : (
+                                    validations.splice(0, 1),
+                                    validations.push(true)
+                                )
+                            ) : (
+                                validations.push(true)
+                            )
+                        ) : (
+                            usernameValidationError.textContent = null,
+                            usernameValidationError.setAttribute('hidden', 'true')
+                        )
+                        //validations = validations.join().split(",").toString().replace('NULL', true).split(",") : validations.push(true)
+                    );
+                    validationsArrLength = validations.length;
+                    checkValidationsForEnableSubmitBtn(validations, validationsArrLength);
+                };
+            });
+            
+            let passwordEntry = '';
+            pswElement.addEventListener('change', (ev) => {
+                passwordEntry = ev.target.value;
+                const pswValidationError = document.querySelector('#pswValidationError');
+                passwordEntry.length>=0 && passwordEntry.length<8 ? (
+                    !validations.at(1) ? (
+                        !validations.at(0) ? (
+                            pswValidationError.textContent = "debe tener al menos 8 caracteres",
+                            validations.at(0)!==undefined ? (
+                                pswValidationError.removeAttribute('hidden')
+                            ) : (
+                                pswValidationError.removeAttribute('hidden'),
+                                validations.push(false)
+                            )
+                        ) : (
+                            pswValidationError.removeAttribute('hidden')
+                        )
+                    ) : (
+                        !validations.at(0) ? (
+                            pswValidationError.removeAttribute('hidden'),
+                            pswValidationError.textContent = "debe tener al menos 8 caracteres",
+                            validations.at(0)!==undefined ? (
+                                validations.splice(1, 1),
+                                validations.push(false)
+                            ) : (
+                                validations.push(false)
+                            )
+                        ) : (
+                            validations.splice(0, 2),
+                            validations.push(true),
+                            validations.push(false)
+                        )
+                    )
+                ) : (
+                    !validations.at(1) ? (
+                        pswValidationError.textContent = null,
+                        pswValidationError.setAttribute('hidden', 'true'),
+                        !validations.at(0) ? (
+                            validations.at(0)!==undefined ? (
+                                validations.push(true)
+                            ) : (
+                                validations.push(false),
+                                validations.push(true)
+                            )
+                        ) : (
+                            validations.push(true)
+                        )
+                    ) : (
+                        !validations.at(0) ? (
+                            pswValidationError.setAttribute('hidden', 'true'),
+                            pswValidationError.textContent = null,
+                            validations.at(0)!==undefined ? (
+                                validations.splice(1, 1),
+                                validations.push(true)
+                            ) : (
+                                validations.push(false),
+                                validations.push(true)
+                            )
+                        ) : (
+                            validationsArrLength = validations.length
+                        )
+                    )
+                );
+                
+                validationsArrLength = validations.length;
+                if (!validations.includes(false)) {
+                    checkValidationsForEnableSubmitBtn(validations, validationsArrLength)
+                };
+            });
+             

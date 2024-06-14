@@ -1,0 +1,31 @@
+doctype html
+html(lang="es")
+    head
+        meta(charset="UTF-8")
+        meta(name="viewport", content="width=device-width, initial-scale=1.0")
+        title Servicio Web de Usuarios con Nodejs
+    body(style="display: flex; flex-direction: column;  margin-top: 7em;")
+        h2(style="display: flex; justify-content: center; font-family: sans") Home
+        div(style="display: grid; grid-template-rows: 1fr 1fr; row-gap: 3rem; margin-bottom: 3rem; padding-top: 2rem")
+            div(style="display: flex; flex-direction: column; align-items: center;")
+                img(
+                    src="https://img.icons8.com/officel/40/user.png",
+                    alt="user"
+                    width="40"
+                    height="40"
+                    style="margin-bottom: 4pt;"
+                )
+                a(href="/login" style="color: blue; font-family: sans;") Iniciar sesión
+                p(style="font-family: sans; font-size: smaller;") para obtener el ingreso a<br>los servicios como usuario
+            div(style="display: flex; flex-direction: column; align-items: center;")
+                img(
+                    src="https://img.icons8.com/office/40/add-user-male--v1.png"
+                    alt="add-user-male--v1"
+                    width="40"
+                    height="40"
+                    style="margin-bottom: 4pt;"
+                )
+                a(href="/registro" style="color: blue; font-family: sans;") Registrarse
+                p(style="font-family: sans; font-size: smaller;") para guardar tu informa-<br>ción y así poder ingresar
+        include components/footer
+            
